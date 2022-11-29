@@ -2,17 +2,17 @@
 #include <windows.h> //untuk system cls
 using namespace std;
 int main(){
-	char keterangan[100][100], keterangann[100][100];				//array keterangan
+    char keterangan[100][100], keterangann[100][100];				                        //array keterangan
     double pemasukan,pengeluaran;									//input pemasukan dan pengeluaran
     int a,b,i,ket1,ket2,menu;										//looping
     double total,tsa,tsb;										//selisih, total pemasukan, total pengeluaran
-    char ulangi = 'y';												//looping do while
-    int counter = 0;												//looping do while
-    string pass, user;												//input user dan password
-	string username ="daspro";										//username
+    char ulangi = 'y';										        //looping do while
+    int counter = 0;											//looping do while
+    string pass, user;											//input user dan password
+    string username ="daspro";										//username
     string password = "daspro";										//password
-    string login = "block";											//pembatasan login
-	string nm;														//input nama
+    string login = "block";										//pembatasan login
+	string nm;											//input nama
 	i = 1;
     cout<<"#######################################################"<<endl;
 	cout<<"######                                           ######"<<endl;
