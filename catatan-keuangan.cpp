@@ -1,379 +1,400 @@
 #include <iostream>
-#include <iomanip>													//manipulator
-#include <fstream> 													//untuk mengeluarkan output program ke file lain
-#include <string>								//string
-#include <windows.h>								//untuk system cls
+#include <fstream>
+#include <unistd.h>
+
 using namespace std;
+/*Tugas Kelompok 3, kasir restoran
+  Anggota kelompok :
+   1. Faizal Azzriel Gibar 2205719
+   2. Rofi'ul Himam 2206231
+   3. Jovanka Alexandro 2206407
+   4. Nadila putri Prihanita 2209757 */
+string validasi;
+// Fungsi Login
+int login() 
+{
+  string pass, username;
+  string usn_true = "kelompok3";
+  string pw_true = "restoran";
+  int counter = 9;
+  
+  system("cls");
+  cout << "\t\t\t\t===================================================\n";
+  cout << "\t\t\t\t========== Selamat Datang di IZEL RESTO ===========\n";
+  cout << "\t\t\t\t===================================================\n\n";
+  for (int i = 2; i >= 0; --i) 
+  {
+    cout << "\t\t\t\t                  Silahkan Login                   \n\n";
+    cout << "\t\t\t\tUsername: ";
+    cin >> username;
+    cout << "\t\t\t\tPassword: ";
+    cin >> pass;
+    system("cls");
+    if (pass == pw_true && username == usn_true) 
+    {
+      validasi = "berhasil";
+      break;
+    }
+    else if (i == 0) 
+    {
+      while (counter >= 1)
+      {
+          cout << "\r\t\t\t\tAnda tidak diperkenankan masuk, coba lagi dalam: " << counter << flush;
+          sleep(1);
+          counter--;
+      }
+      return login();
+      break;
+    }
+    cout << "\t\t\t\t     Login salah! Kesempatan Anda " << i << " kali lagi!!    \n";
+    cout << "\t\t\t\t===================================================\n\n";
+  }
+}
+// Fungsi Pemesanan Makanan
+void pesan_makanan() 
+{
+	ofstream outdata;
+  string menu[11] = {"",     "Batagor", "Seblak", "Bakso",  "Rawon", "Soto",
+                     "Kopi", "Teh",     "Susu",   "Mojito", "Sprite"};
+  int harga[11] = {0,    15000, 10000, 12000, 12500, 17000,
+                   6500, 5000,  5000,  8500,  5000};
+  string ulang, namaPelanggan;
+  int input = 0, total = 1, output, total_pembayaran = 0, uang, kembalian, metodePembayaran;
+  int pesanan[100], total_harga[100], qty[100];
 
-//Kekurangan: 1. Belum bisa menambahkan getline() pada keterangan
-//	      2. Belum bisa menambahkan double save, jadi hanya bisa save 1x untuk satu program, ketika udah save trs mengulang program lagi menggunakan dowhile, data ga ke save
-//	      3. Masih terjadi error jika merubah int ke float/double pada jenis tipe data dari input pemasukan pengeluaran
+  cout << "\t\t\t\tMasukan nama anda: ";
+  cin.ignore();
+  getline(cin, namaPelanggan);
+  cout << "\t\t\t\tPelanggan dengan atas nama: " << namaPelanggan << "\n";
+  cout << "\t\t\t\tDaftar Menu: \n";
+  for (int i = 1; i < 11; i++) 
+  {
+    cout << "\t\t\t\t" << i << ". " << menu[i] << " : " << harga[i] << "\n";
+  }
+  cout << "\n";
+  do 
+  {
+    cout << "\t\t\t\tSilahkan pilih menu: ";
+    cin >> pesanan[input];
+    if (pesanan[input] > 10) 
+    {
+      system("cls");
+      cout << "\t\t\t\tmenu tidak ditemukan\n";
+      return pesan_makanan();
+    }
+    cout << "\t\t\t\tMasukan jumlah porsi: ";
+    cin >> qty[input];
+    cout << "\t\t\t\tApakah anda ingin memesan menu lagi?(y/t) ";
+    cin >> ulang;
+    cout << "\n";
+    input++;
+    total++;
+  }
+   while (ulang == "y");
+  
+  system("cls");
+  cout << "\t\t\t\t===================================================\n";
+  cout << "\t\t\t\t=================== IZEL RESTO ====================\n";
+  cout << "\t\t\t\t===================================================\n\n";
+  cout << "\t\t\t\tMenu yang sudah di pesan:\n";
+  for (int i = 0; i < total - 1; i++) 
+  {
+    output = pesanan[i];
+    total_harga[i] = harga[output] * qty[i];
 
-int main(){
-    ofstream outdata,outdata2,outdata3;						//untuk save ke exel
-    char keterangan[100][100], keterangann[100][100];				//array keterangan
-    int pemasukan,pengeluaran;				 			//input pemasukan dan pengeluaran
-    int a,b,i,c,d,ket1,ket2,menu3,menu,n=1;					//looping
-    int total,tsa=0,tsb=0;							//selisih, total pemasukan, total pengeluaran
-    char ulangi = 'y';								//looping do while
-    int counter = 0;								//looping do while
-    string pass, user;								//input user dan password
-    string username ="daspro";							//username
-    string password = "daspro";							//password
-    string login = "block";							//pembatasan login
-	string nm;								//input nama
-	string file;								//input nama file untuk di save
-	i = 1;									//looping
-	string hari,hari2;							//hari
-	int tanggal,tanggal2,bulan,bulan2,tahun,tahun2;				//date
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######             Login di Aplikasi             ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;	   
-//perulangan login
-do{        
-       cout << " Username: "; cin>>user;        
-       cout << " Password: "; cin>>pass;        
-       if (user == username && pass == password) {    
-	       system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;	   
-    cout<<" Nama : ";
+    cout << "\t\t\t\tMenu : " << menu[output] << "\n";
+    cout << "\t\t\t\tJumlah : " << qty[i] << "\n";
+    cout << "\t\t\t\tHarga : " << total_harga[i] << "\n\n";
+  }
+  for (int i = 0; i < total - 1; i++) 
+  {
+    total_pembayaran += total_harga[i];
+  }
+  system("pause");
+  system("cls");
+  cout << "\t\t\t\t===================================================\n";
+  cout << "\t\t\t\t=================== IZEL RESTO ====================\n";
+  cout << "\t\t\t\t===================================================\n\n";
+  cout << "\t\t\t\tTotal harga yang harus dibayar adalah: Rp" << total_pembayaran << "\n\n";
+  cout << "\t\t\t\t1.Dana\n";
+  cout << "\t\t\t\t2.Ovo\n";
+  cout << "\t\t\t\t3.LinkAja \n";
+  cout << "\t\t\t\t4.GoPay \n";
+  cout << "\t\t\t\t5.Cash \n";
+  cout << "\t\t\t\tPilih metode pembayaran anda: ";
+  cin >> metodePembayaran;
+  if (metodePembayaran == 1) 
+  {
+    // Output nama + total pembayaran + metode pembayaran
+    cout << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    cout << "\t\t\t\tNama Pelanggan    : " << namaPelanggan << "\n";
+    cout << "\t\t\t\tMetode Pembayaran : Dana \n";
+    cout << "\t\t\t\tTotal Harga       : Rp" << total_pembayaran << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    outdata.open("struk_bayar.txt", ios::ate);
+    outdata << "\n";
+    outdata << "\t\t\t\t===================================================\n";
+    outdata << "\t\t\t\tNama Pelanggan    : " << namaPelanggan << "\n";
+    outdata << "\t\t\t\tMetode Pembayaran : Dana \n";
+    outdata << "\t\t\t\tTotal Harga       : Rp" << total_pembayaran << "\n";
+    outdata << "\t\t\t\t===================================================\n";  
+  } 
+  else if (metodePembayaran == 2) 
+  {
+    // Output nama + total pembayaran + metode pembayaran
+    cout << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    cout << "\t\t\t\tNama Pelanggan    : " << namaPelanggan << "\n";
+    cout << "\t\t\t\tMetode Pembayaran : Ovo \n";
+    cout << "\t\t\t\tTotal Harga       : Rp" << total_pembayaran << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    outdata.open("struk_bayar.txt", ios::ate);
+    outdata << "\n";
+    outdata << "\t\t\t\t===================================================\n";
+    outdata << "\t\t\t\tNama Pelanggan    : " << namaPelanggan << "\n";
+    outdata << "\t\t\t\tMetode Pembayaran : Ovo \n";
+    outdata << "\t\t\t\tTotal Harga       : Rp" << total_pembayaran << "\n";
+    outdata << "\t\t\t\t===================================================\n";
+  } 
+  else if (metodePembayaran == 3) 
+  {
+    // Output nama + total pembayaran + metode pembayaran
+    cout << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    cout << "\t\t\t\tNama Pelanggan    : " << namaPelanggan << "\n";
+    cout << "\t\t\t\tMetode Pembayaran : LinkAja \n";
+    cout << "\t\t\t\tTotal Harga       : Rp" << total_pembayaran << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    outdata.open("struk_bayar.txt", ios::ate);
+    outdata << "\n";
+    outdata << "\t\t\t\t===================================================\n";
+    outdata << "\t\t\t\tNama Pelanggan    : " << namaPelanggan << "\n";
+    outdata << "\t\t\t\tMetode Pembayaran : LinkAja \n";
+    outdata << "\t\t\t\tTotal Harga       : Rp" << total_pembayaran << "\n";
+    outdata << "\t\t\t\t===================================================\n";
+  } 
+  else if (metodePembayaran == 4) 
+  {
+    // Output nama + total pembayaran + metode pembayaran
+    cout << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    cout << "\t\t\t\tNama Pelanggan    : " << namaPelanggan << "\n";
+    cout << "\t\t\t\tMetode Pembayaran : GoPay";
+    cout << "\n";
+    cout << "\t\t\t\tTotal Harga       : Rp" << total_pembayaran << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    outdata.open("struk_bayar.txt", ios::ate);
+    outdata << "\n";
+    outdata << "\t\t\t\t===================================================\n";
+    outdata << "\t\t\t\tNama Pelanggan    : " << namaPelanggan << "\n";
+    outdata << "\t\t\t\tMetode Pembayaran : GoPay \n";
+    outdata << "\t\t\t\tTotal Harga       : Rp" << total_pembayaran << "\n";
+    outdata << "\t\t\t\t===================================================\n";
+  } 
+  else if (metodePembayaran == 5) 
+  {
+    // Output nama + total pembayaran + metode pembayaran
+    cout << "\n";
+    cout << "\t\t\t\tUang Tunai: Rp";
+    cin >> uang;
+    system("cls");
+    if (uang < total_pembayaran) 
+    {
+      cout << "\t\t\t\tMaaf, uang tidak cukup.\n";
+      return pesan_makanan();
+    }
+    cout << "\n";
+    kembalian = uang - total_pembayaran;
+    cout << "\t\t\t\t===================================================\n";
+    cout << "\t\t\t\tNama Pelanggan   : " << namaPelanggan << "\n";
+    cout << "\t\t\t\tMetode Pembayaran: Cash";
+    cout << "\n";
+    cout << "\t\t\t\tTotal Harga      : Rp" << total_pembayaran << "\n";
+    cout << "\t\t\t\t--------------------------------\n";
+    cout << "\t\t\t\tUang Tunai       : Rp" << uang << "\n";
+    cout << "\t\t\t\tKembalian        : Rp" << kembalian << "\n";
+    cout << "\t\t\t\t===================================================\n";
+    outdata.open("struk_bayar.txt", ios::ate);
+    outdata << "\t\t\t\t===================================================\n";
+    outdata << "\t\t\t\tNama Pelanggan   : " << namaPelanggan << "\n";
+    outdata << "\t\t\t\tMetode Pembayaran: Cash";
+    outdata << "\n";
+    outdata << "\t\t\t\tTotal Harga      : Rp" << total_pembayaran << "\n";
+    outdata << "\t\t\t\t--------------------------------\n";
+    outdata << "\t\t\t\tUang Tunai       : Rp" << uang << "\n";
+    outdata << "\t\t\t\tKembalian        : Rp" << kembalian << "\n";
+    outdata << "\t\t\t\t===================================================\n";
+  } 
+  else 
+  {
+    cout << "\t\t\t\tMetode pembayaran tidak tersedia";
+    return pesan_makanan();
+  }
+}
+
+// Fungsi Cari Menu
+void cari_menu() 
+{
+  string pilihMakanan;
+  string hasil;
+  string lanjut;
+  string makanan[10] = {"seblak", "batagor", "bakso",  "rawon", "kopi",
+                        "susu",   "sprite",  "mojito", "teh",   "soto"};
+  do 
+  {
+    system("cls");
+    cout << "\t\t\t\tInput nama Menu yang ingin dicari: ";
     cin.ignore();
-    getline(cin, nm);
-//perulangan menu
-do {
-    system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;	   
-    cout<<"1. skala harian"<<endl;
-    cout<<"2. skala mingguan"<<endl;
-    cout<<"3. skala bulanan"<<endl;
-    cout<<"masukan menu: ";
-    cin>>menu;
-    //switch case
-    switch (menu) {	
-    for (menu=0; menu>=5; menu++)
-    case 1 : 
-    system("cls");
-    //pemilihan waktu (hari,tanggal,bulan,tahun)
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<"                   (Contoh: selasa)                    "<<endl;
-    cout<<" Masukan hari: ";cin>>hari;
-    system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;	   
-    cout<<"                      (Contoh: 21)                     "<<endl;
-    cout<<" Masukan tanggal: ";cin>>tanggal;
-    system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;	   
-    cout<<"                      (Contoh: 10)                     "<<endl;
-    cout<<" Masukan bulan: ";cin>>bulan;
-    system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;	   
-    cout<<"                    (Contoh: 2003)                     "<<endl;
-    cout<<" Masukan tahun: ";cin>>tahun;
-    system("cls");
-    //menu 1. harian
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Date: "<<hari<<","<<tanggal<<"-"<<bulan<<"-"<<tahun<<endl;
-    //input pemasukan
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Masukan Jumlah Pemasukan Hari Ini	: ";cin>>ket1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
-    cout<<"-------------------------------------------------------"<<endl;
-        for (a=1; a<=ket1; a++){
-        cout<<" pemasukan	: ";cin>>pemasukan;
-        cout<<" Keterangan	: ";cin>>keterangan[a];
-        tsa+=pemasukan;
+    getline(cin, pilihMakanan);
+    // Looping array terlebih dahulu
+    for (int i = 0; i < 10; i++) {
+      if (pilihMakanan == makanan[i]) {
+        // Masukan data makanan yang benar kedalam variable
+        hasil = makanan[i];
+      }
     }
-     //input pengeluaran
-    cout<<"-------------------------------------------------------"<<endl;
-     cout<<" Masukan Jumlah Pengeluaran Hari Ini	 : ";cin>>ket2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
-    cout<<"-------------------------------------------------------"<<endl;
-        for (b=1; b<=ket2; b++){
-        cout<<" pengeluaran	: ";cin>>pengeluaran;
-        cout<<" Keterangan	: ";cin>>keterangann[b];
-		tsb+=pengeluaran;  
+    // Penkondisian hasil pilih makanan dan hasil data yang benar
+    if (pilihMakanan == hasil) 
+    {
+      for (int i = 1; i < 10; i++) 
+      {
+        cout << "\t\t\t\t" << i << "." << makanan[i] << "\n";
+      }
+      // Jika benar
+      cout << "\t\t\t\tMenu " << hasil << " di temukan";
+      cout << "\n";
+    } 
+    else 
+    {
+      // Jika salah
+      cout << "\t\t\t\tMenu " << pilihMakanan << " tidak di temukan";
+      cout << "\n";
     }
+    cout << "\t\t\t\tMau cari lagi? (y/t): ";
+    cin >> lanjut;
+  } 
+  while (lanjut == "y");
+}
+// Menu Profil
+void profil() 
+{
+  int a;
+  string lagi;
+  do 
+  {
     system("cls");
-    //output data
-    total=tsa-tsb;
-    cout<<" history keterangan "<<endl;
-		//output pemasukan
-    for (a=1; a<=ket1; a++){
-        cout<<"-------------------------------------------------------"<<endl;
-        cout<<" keterangan   : "<<keterangan[a]<<endl;
-        cout<<endl;
-        }
-        //output pengeluaran
-    for (b=1; b<=ket2; b++){
-        cout<<"-------------------------------------------------------"<<endl;
-        cout<<endl<<" keterangan   : "<<keterangann[b]<<endl;
-        cout<<endl;
-        }
-    //hasil nya
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Total Pemasukan    : ";cout<<tsa<<endl;
-    cout<<" Total Pengeluaran  : ";cout<<tsb<<endl;
-    cout<<" Selisih            : ";cout<<total<<endl;
-	if (total>0){
-		cout<<" bagus "<<nm; cout<<" sudah hebat"<<endl;
-	}                                                            
-	else if (total<0){
-		cout<<" semangat!! "<<nm; cout<<" harus belajar berhemat dan manajemen uang!! "<<endl;
-	} 
-	else{
-		cout<<" mohon tingkatkan lagi, "<<nm; cout<<" harus berhemat!!"<<endl;
-	}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ;
-    cout<<"-------------------------------------------------------"<<endl;
-    //save file
-    cout<<"contoh: laporan.txt | laporan.csv"<<endl;
-    cout<<"Masukan Nama File: ";
-    cin>>file;
-    outdata.open(file, ios::app);
-    outdata<<"-------------------------------------------------------"<<endl;
-    outdata<<"Nama: "<<nm<<endl;
-    outdata<<"Date: "<<hari<<","<<tanggal<<"-"<<bulan<<"-"<<tahun<<endl;
-    outdata<<"-------------------------------------------------------"<<endl;
-	outdata<<"Total pemasukan: "<<tsa<<endl;
-	outdata<<"Total Pengeluaran: "<<tsb<<endl;
-	outdata<<"Selisih: "<<total<<endl;
-	cout<<"data berhasil disimpan!"<<endl;
-	printf("lanjut atau tidak? (y/t): ");
-        cin>>ulangi;
-	break;
-	case 2 : //menu 2
-    //pemilihan waktu (hari,tanggal,bulan,tahun)
-    system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<"            Contoh: (Rabu) (21) (12) (2022)          "<<endl;
-    cout<<" Masukan hari: ";cin>>hari;
-    cout<<" Sampai hari: ";cin>>hari2;
-    cout<<" Masukan tanggal: ";cin>>tanggal;
-    cout<<" Sampai tanggal: ";cin>>tanggal2;
-    cout<<" Masukan bulan: ";cin>>bulan;
-    cout<<" Sampai bulan: ";cin>>bulan2;
-    cout<<" Masukan tahun: ";cin>>tahun;
-    cout<<" Sampai tahun: ";cin>>tahun2;
-    //menu 2. mingguan
-	for(int c=1; c<8; c++){
-    system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    printf("\t Hari ke: %i\n", c);
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Date: "<<hari<<","<<tanggal<<"-"<<bulan<<"-"<<tahun<<" Sampai "<<hari2<<","<<tanggal2<<"-"<<bulan2<<"-"<<tahun2<<endl;
-    //input pemasukan
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Masukan Jumlah Pemasukan Hari Ini	: ";cin>>ket1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
-    cout<<"-------------------------------------------------------"<<endl;
-        for (a=1; a<=ket1; a++){
-        cout<<" pemasukan	: ";cin>>pemasukan;
-        cout<<" Keterangan	: ";cin>>keterangan[a];
-        tsa+=pemasukan;
+    cout << "\t\t\t\tTentang karyawan Restoran, kelompok 3\n";
+    cout << "\t\t\t\t1.Faizal\n";
+    cout << "\t\t\t\t2.Rofi'ul\n";
+    cout << "\t\t\t\t3.Jovanka\n";
+    cout << "\t\t\t\t4.Nadila\n";
+    cout << "\t\t\t\tSilahkan ingin lihat yang mana(1-4) ";
+    cin >> a;
+    switch (a)
+    {
+    case 1:
+      system("cls");
+      cout << "\t\t\t\tNama Lengkap   : Faizal Azzriel Gibar\n";
+      cout << "\t\t\t\tNama Panggilan : Paisal\n";
+      cout << "\t\t\t\tNIM            : 2205719\n";
+      break;
+    case 2:
+      system("cls");
+      cout << "\t\t\t\tNama Lengkap   : Rofi'ul Himam\n";
+      cout << "\t\t\t\tNama Panggilan : Rofi\n";
+      cout << "\t\t\t\tNIM            : 2206231\n";
+      break;
+    case 3:
+      system("cls");
+      cout << "\t\t\t\tNama Lengkap   : Jovanka Alexandro\n";
+      cout << "\t\t\t\tnama Panggilan : Jovan\n";
+      cout << "\t\t\t\tNIM            : 2206407\n";
+      break;
+    case 4:
+      system("cls");
+      cout << "\t\t\t\tNama Lengkap   : Nadila Putri Prihanita\n";
+      cout << "\t\t\t\tNama Panggilan : Nadila\n";
+      cout << "\t\t\t\tNIM            : 2209757\n";
+      break;
+    default:
+      cout << "\t\t\t\tKaryawan tidak ditemukan\n";
     }
-     //input pengeluaran
-    cout<<"-------------------------------------------------------"<<endl;
-     cout<<" Masukan Jumlah Pengeluaran Hari Ini	 : ";cin>>ket2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
-    cout<<"-------------------------------------------------------"<<endl;
-        for (b=1; b<=ket2; b++){
-        cout<<" pengeluaran	: ";cin>>pengeluaran;
-        cout<<" Keterangan	: ";cin>>keterangann[b];
-		tsb+=pengeluaran;  
-    }
+    cout << "\t\t\t\tLagi?(y/n) ";
+    cin >> lagi;
+  }
+   while (lagi == "y");
+}
+// Program Utama
+int main() 
+{
+  int menu;
+  string ulang;
+  login();
+  if (validasi == "berhasil") 
+  {
+    do 
+    {
+      system("cls");
+      cout << "\t\t\t\t===================================================\n";
+      cout << "\t\t\t\t=================== IZEL RESTO ====================\n";
+      cout << "\t\t\t\t===================================================\n\n";
+      cout << "\t\t\t\t<--------------------( MENU )--------------------->\n\n";
+      cout << "\t\t\t\t1.Pesan makanan dan minuman\n";
+      cout << "\t\t\t\t2.Cari menu\n";
+      cout << "\t\t\t\t3.Anggota kelompok\n";
+      cout << "\t\t\t\t4.Log Out\n";
+      cout << "\t\t\t\t5.EXIT\n";
+      cout << "\t\t\t\tsilahkan pilih menu(1-5): ";
+      cin >> menu;
+      switch (menu) 
+      {
+      case 1:
+        system("cls");
+        cout << "\t\t\t\t===================================================\n";
+        cout << "\t\t\t\t=================== IZEL RESTO ====================\n";
+        cout << "\t\t\t\t===================================================\n\n";
+        pesan_makanan();
+        break;
+      case 2:
+        system("cls");
+        cout << "\t\t\t\t===================================================\n";
+        cout << "\t\t\t\t=================== IZEL RESTO ====================\n";
+        cout << "\t\t\t\t===================================================\n\n";
+        cari_menu();
+        break;
+      case 3:
+        system("cls");
+        cout << "\t\t\t\t===================================================\n";
+        cout << "\t\t\t\t=================== IZEL RESTO ====================\n";
+        cout << "\t\t\t\t===================================================\n\n";
+        profil();
+        break;
+      case 4:
+        system("cls");
+        cout << "\t\t\t\t===================================================\n";
+        cout << "\t\t\t\t=================== IZEL RESTO ====================\n";
+        cout << "\t\t\t\t===================================================\n\n";
+        cout << "\t\t\t\t<------------( Anda Berhasil Log Out )------------>\n";
+        return main();
+        break;
+      case 5:
+        system("cls");
+        cout << "\t\t\t\t===================================================\n";
+        cout << "\t\t\t\t=================== IZEL RESTO ====================\n";
+        cout << "\t\t\t\t===================================================\n\n";
+        cout << "Program selesai.....\n";
+        return 0;
+        break;
+      default:
+        cout << "\t\t\t\ttidak ada menu\n";
+      }
+      cout << "\t\t\t\tke menu/log out(y/t) ";
+      cin >> ulang;
+    } 
+    while (ulang == "y");
     system("cls");
-    //output data
-    total=tsa-tsb;
-    //hasil nya
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Total Pemasukan    : ";cout<<tsa<<endl;
-    cout<<" Total Pengeluaran  : ";cout<<tsb<<endl;
-    cout<<" Selisih            : ";cout<<total<<endl;
-	if (total>0){
-		cout<<" bagus "<<nm; cout<<" sudah hebat"<<endl;
-	}                                                            
-	else if (total<0){
-		cout<<" semangat!! "<<nm; cout<<" harus belajar berhemat dan manajemen uang!! "<<endl;
-	} 
-	else{
-		cout<<" mohon tingkatkan lagi, "<<nm; cout<<" harus berhemat!!"<<endl;
-	}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ;
-    cout<<"-------------------------------------------------------"<<endl;
-	} //end perulangan for
-	cout<<"contoh: laporan.txt | laporan.csv"<<endl;
-    cout<<"Masukan Nama File: ";
-    cin>>file;
-    outdata2.open(file, ios::app);
-    outdata2<<"-------------------------------------------------------"<<endl;
-    outdata2<<"Nama: "<<nm<<endl;
-    outdata2<<" Date: "<<hari<<","<<tanggal<<"-"<<bulan<<"-"<<tahun<<" Sampai "<<hari2<<","<<tanggal2<<"-"<<bulan2<<"-"<<tahun2<<endl;
-    outdata2<<"-------------------------------------------------------"<<endl;
-	outdata2<<"Total pemasukan: "<<tsa<<endl;
-	outdata2<<"Total Pengeluaran: "<<tsb<<endl;
-	outdata2<<"Selisih: "<<total<<endl;
-	cout<<"data berhasil disimpan!"<<endl;
-          printf("lanjut atau tidak? (y/t): ");
-        cin>>ulangi;
-    break;
-    case 3 : // menu 3
-	system("cls");
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Jumlah hari dalam sebulan 30 hari atau 31 hari?	: ";cin>>menu3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ;
-    cout<<"-------------------------------------------------------"<<endl;
-    //pemilihan waktu (hari,tanggal,bulan,tahun)
-    system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<"            Contoh: (Rabu) (21) (12) (2022)          "<<endl;
-    cout<<" Masukan hari: ";cin>>hari;
-    cout<<" Sampai hari: ";cin>>hari2;
-    cout<<" Masukan tanggal: ";cin>>tanggal;
-    cout<<" Sampai tanggal: ";cin>>tanggal2;
-    cout<<" Masukan bulan: ";cin>>bulan;
-    cout<<" Sampai bulan: ";cin>>bulan2;
-    cout<<" Masukan tahun: ";cin>>tahun;
-    cout<<" Sampai tahun: ";cin>>tahun2;
-	for(int d=1; d<menu3; d++){
-    system("cls");
-    cout<<"#######################################################"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"######        Selamat Datang di Aplikasi         ######"<<endl;
-	cout<<"######             Catatan Keuangan              ######"<<endl;
-	cout<<"######                                           ######"<<endl;
-	cout<<"#######################################################"<<endl;
-    printf("\t Hari ke: %d \n", d);
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Date: "<<hari<<","<<tanggal<<"-"<<bulan<<"-"<<tahun<<" Sampai "<<hari2<<","<<tanggal2<<"-"<<bulan2<<"-"<<tahun2<<endl;
-    //input pemasukan
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Masukan Jumlah Pemasukan Hari Ini	: ";cin>>ket1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
-    cout<<"-------------------------------------------------------"<<endl;
-        for (a=1; a<=ket1; a++){
-        cout<<" pemasukan	: ";cin>>pemasukan;
-        cout<<" Keterangan	: ";cin>>keterangan[a];
-        tsa+=pemasukan;
-    }
-     //input pengeluaran
-    cout<<"-------------------------------------------------------"<<endl;
-     cout<<" Masukan Jumlah Pengeluaran Hari Ini	 : ";cin>>ket2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
-    cout<<"-------------------------------------------------------"<<endl;
-        for (b=1; b<=ket2; b++){
-        cout<<" pengeluaran	: ";cin>>pengeluaran;
-        cout<<" Keterangan	: ";cin>>keterangann[b];
-		tsb+=pengeluaran;  
-    }
-    system("cls");
-    //output data
-    total=tsa-tsb;
-    //hasil nya
-    cout<<"-------------------------------------------------------"<<endl;
-    cout<<" Total Pemasukan    : ";cout<<tsa<<endl;
-    cout<<" Total Pengeluaran  : ";cout<<tsb<<endl;
-    cout<<" Selisih            : ";cout<<total<<endl;
-	if (total>0){
-		cout<<" bagus "<<nm; cout<<" sudah hebat"<<endl;
-	}                                                            
-	else if (total<0){
-		cout<<" semangat!! "<<nm; cout<<" harus belajar berhemat dan manajemen uang!! "<<endl;
-	} 
-	else{
-		cout<<" mohon tingkatkan lagi, "<<nm; cout<<" harus berhemat!!"<<endl;
-	}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ;
-    cout<<"-------------------------------------------------------"<<endl;
-	} //end perulangan for
-	cout<<"contoh: laporan.txt | laporan.csv"<<endl;
-    cout<<"Masukan Nama File: ";
-    cin>>file;
-    outdata3.open(file, ios::app);
-    outdata3<<"-------------------------------------------------------"<<endl;
-    outdata3<<"Nama: "<<nm<<endl;
-    outdata3<<" Date: "<<hari<<","<<tanggal<<"-"<<bulan<<"-"<<tahun<<" Sampai "<<hari2<<","<<tanggal2<<"-"<<bulan2<<"-"<<tahun2<<endl;
-    outdata3<<"-------------------------------------------------------"<<endl;
-	outdata3<<"Total pemasukan: "<<tsa<<endl;
-	outdata3<<"Total Pengeluaran: "<<tsb<<endl;
-	outdata3<<"Selisih: "<<total<<endl;
-	cout<<"data berhasil disimpan!"<<endl;
-          printf("lanjut atau tidak? (y/t): ");
-        cin>>ulangi;
-    break;
-    }
-        // increment counter
-        counter++;
-} while(ulangi == 'y');
-    printf("\n\n----------\n");
-    printf("Data Berhasil di simpan!\n");
-    printf("File data anda berada di folder yang sama dengan file aplikasi ini\n", counter);
-    i = 4;
-           login = "berhasil";        } 
-       else {
-	       system("cls");            
-           cout<<"#################################################"<<endl;            
-           cout<<"#      Username atau Password salah!! ("<<i<<"x)      #"<<endl;
-           cout<<"#################################################"<<endl;           
-           i = i +1; 
-       }
-} while (i <= 3);
-    if(login != "berhasil"){
-       cout<<" "<<endl;
-       cout<<"Kamu sudah login lebih dari 3x"<<endl;       
-       cout<<"Silahkan coba 9999999 tahun lagi untuk login, hehe canda!"<<endl;      
-	}   
-    return 0;
+    cout << "\t\t\t\t<------------( Anda Berhasil Log Out )------------>\n";
+    return main();
+  }
 }
